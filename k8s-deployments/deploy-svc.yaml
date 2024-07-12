@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: burhan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment
+    spec:
+      # securityContext:
+      #   runAsUser: 1000 
+      #   runAsGroup: 1000  
+      containers:
+        - name: nginx
+          image: anwapplication.azurecr.io/demo3-nginx:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-html-sc
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: nginx-html-sc
+          persistentVolumeClaim:
+            claimName: nginx-html-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: burhan
+  labels:
+    app: nginx-deployment
+spec:
+  selector:
+    app: nginx-deployment
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+

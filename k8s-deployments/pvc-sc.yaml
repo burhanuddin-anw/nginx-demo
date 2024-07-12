@@ -1,0 +1,30 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nginx-html-sc
+provisioner: file.csi.azure.com
+# provisioner: disk.csi.azure.com
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+mountOptions:
+  - mfsymlinks
+  - actimeo=30
+  - nosharesock
+volumeBindingMode: Immediate
+parameters:
+  skuName: Standard_LRS
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-html-pvc
+  namespace: burhan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nginx-html-sc
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
